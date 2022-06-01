@@ -1,18 +1,14 @@
 version: '3.7'
 
 services:
-  mongodb:
+  mongo:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: news
-#      MONGODB_USER: root
-#      MONGODB_PASSWORD: root
-#      MONGODB_HOST: mongodb:27017
-#      DATABASE_NAME: products
+      MONGO_INITDB_DATABASE: products
     ports:
       - 27017:27017
     volumes:
