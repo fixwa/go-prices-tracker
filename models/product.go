@@ -1,20 +1,21 @@
 package models
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type Product struct {
-	ID           int `gorm:"primary_key;"`
-	Title        string
-	Content      string
-	Source       int
-	URL          string
-	Price        string
-	CategoryName string
-	Thumbnail    string
-	PublishedAt  time.Time
-	CreatedAt    time.Time
+	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Title        string             `json:"title" bson:"title,omitempty"`
+	Content      string             `json:"content" bson:"content,omitempty"`
+	Source       int                `json:"source" bson:"source,omitempty"`
+	URL          string             `json:"url" bson:"url,omitempty"`
+	Price        string             `json:"price" bson:"price,omitempty"`
+	CategoryName string             `json:"categoryName" bson:"categoryName,omitempty"`
+	Thumbnail    string             `json:"thumbnail" bson:"thumbnail,omitempty"`
+	PublishedAt  time.Time          `json:"publishedAt" bson:"publishedAt,omitempty"`
+	CreatedAt    time.Time          `json:"createdAt" bson:"createdAt,omitempty"`
 }
 
 type ProductSource struct {

@@ -49,6 +49,9 @@ func ConnectDatabase() {
 
 	// mongodb+srv
 	uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
+	//uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST
+	//fmt.Println(uri)
+	//uri := "mongodb://root:root@localhost:27017"
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 
 	if err != nil {
@@ -65,4 +68,10 @@ func ConnectDatabase() {
 
 	Db = client.Database(MONGODB_DBNAME)
 	fmt.Println("Successfuly connected to the database.")
+
+	migrateDatabase()
+}
+
+func migrateDatabase() {
+
 }

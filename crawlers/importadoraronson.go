@@ -1,10 +1,14 @@
 package crawlers
 
 import (
+	"context"
 	"fmt"
+	"github.com/fixwa/go-prices-tracker/database"
 	"github.com/fixwa/go-prices-tracker/models"
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/queue"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"strings"
 	"sync"
@@ -94,7 +98,7 @@ func CrawlImportadoraRonson(w *sync.WaitGroup) {
 
 	detailCollector.OnHTML(".product-main", func(e *colly.HTMLElement) {
 		title := e.ChildText("h1.product-title")
-		price := "[" + e.ChildText("p.price:first-child") + "]"
+		price := e.ChildText(".product-info > div.price-wrapper > p.price")
 		thumbnail := e.ChildAttr("img.wp-post-image", "data-src")
 		publishedAt := time.Now()
 		categoryName := e.ChildText("span.posted_in")
@@ -109,7 +113,7 @@ func CrawlImportadoraRonson(w *sync.WaitGroup) {
 			Thumbnail:    thumbnail,
 			PublishedAt:  publishedAt,
 		}
-		fmt.Printf("%v\n", product)
+		storeProduct(product)
 	})
 
 	q.AddURL(currentSource.BaseURL)
@@ -118,4 +122,39 @@ func CrawlImportadoraRonson(w *sync.WaitGroup) {
 	q.Run(c)
 	log.Println("Finished " + currentSource.Name)
 	w.Done()
+}
+
+func storeProduct(product *models.Product) {
+	productsCollection := database.Db.Collection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	//p := models.Product{
+	//	//ID:           primitive.ObjectID{},
+	//	Title:        "The Title",
+	//	Content:      "The content",
+	//	Source:       0,
+	//	URL:          "http://example.com",
+	//	Price:        "100.00",
+	//	CategoryName: "Testing",
+	//	Thumbnail:    "http://example.com/image.png",
+	//	PublishedAt:  time.Time{},
+	//	CreatedAt:    time.Time{},
+	//}
+
+	result, err := productsCollection.InsertOne(ctx, bson.M{
+		"title":        product.Title,
+		"content":      product.Content,
+		"source":       product.Source,
+		"url":          product.URL,
+		"price":        product.Price,
+		"categoryName": product.CategoryName,
+		"thumbnail":    product.Thumbnail,
+		"createdAt":    time.Now(),
+		"publishedAt":  product.PublishedAt,
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Stored product: ", result.InsertedID.(primitive.ObjectID))
 }
