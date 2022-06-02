@@ -10,7 +10,10 @@ func main() {
 	database.ConnectDatabase()
 
 	var waiter sync.WaitGroup
+	//waiter.Add(1)
+	//go crawlers.CrawlImportadoraRonson(&waiter)
+
 	waiter.Add(1)
-	go crawlers.CrawlImportadoraRonson(&waiter)
+	go crawlers.CrawlGeeker(&waiter)
 	waiter.Wait()
 }

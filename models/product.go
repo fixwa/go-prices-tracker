@@ -8,7 +8,7 @@ import (
 type Product struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Title        string             `json:"title" bson:"title,omitempty"`
-	Content      string             `json:"content" bson:"content,omitempty"`
+	Description  string             `json:"description" bson:"description,omitempty"`
 	Source       int                `json:"source" bson:"source,omitempty"`
 	URL          string             `json:"url" bson:"url,omitempty"`
 	Price        string             `json:"price" bson:"price,omitempty"`
@@ -34,6 +34,14 @@ func init() {
 		BaseURL:        "https://importadoraronson.com/",
 		AllowedDomains: "importadoraronson.com",
 	}
+
+	s2 := ProductSource{
+		ID:             2,
+		Name:           "Geeker",
+		BaseURL:        "https://www.geeker.com.ar/",
+		AllowedDomains: "www.geeker.com.ar",
+	}
 	ProductsSources = make(map[int]*ProductSource)
 	ProductsSources[1] = &s1
+	ProductsSources[2] = &s2
 }
