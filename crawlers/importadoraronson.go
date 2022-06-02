@@ -12,7 +12,13 @@ import (
 )
 
 func CrawlImportadoraRonson(w *sync.WaitGroup) {
-	currentSource = models.ProductsSources[1]
+	productsLinks := map[string]bool{}
+	categoriesLinks := map[string]bool{}
+	categoriesPagesLinks := map[string]bool{}
+	var totalProductsCollected int = 0
+
+	currentSource := models.ProductsSources[1]
+	fmt.Printf("%v\n", currentSource)
 	log.Println("Crawling " + currentSource.Name)
 
 	c := colly.NewCollector(
@@ -97,12 +103,15 @@ func CrawlImportadoraRonson(w *sync.WaitGroup) {
 			PublishedAt:  publishedAt,
 		}
 		storeProduct(product)
+		totalProductsCollected++
 	})
 
 	q.AddURL(currentSource.BaseURL)
 
 	// Consume
 	q.Run(c)
-	log.Println("Finished " + currentSource.Name)
+
+	log.Printf("\x1b[%dm%s %s\x1b[0m", 31, currentSource.Name, "Finished!")
+	log.Println("Total Products Collected: ", totalProductsCollected)
 	w.Done()
 }

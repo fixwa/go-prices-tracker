@@ -11,9 +11,13 @@ import (
 )
 
 func CrawlGeeker(w *sync.WaitGroup) {
+	productsLinks := map[string]bool{}
+	categoriesLinks := map[string]bool{}
+	categoriesPagesLinks := map[string]bool{}
 	var totalProductsCollected int = 0
-	currentSource = models.ProductsSources[2]
 
+	currentSource := models.ProductsSources[2]
+	fmt.Printf("%v\n", currentSource)
 	log.Println("Crawling " + currentSource.Name)
 
 	frontPageCollector := colly.NewCollector(
@@ -83,6 +87,7 @@ func CrawlGeeker(w *sync.WaitGroup) {
 		})
 
 	})
+
 	//body > div.container.general
 	//body > div.container.general > div > div > div.recomendadosrow.row
 	productCollector.OnHTML("div.recomendadosrow.row", func(e *colly.HTMLElement) {
@@ -130,7 +135,7 @@ func CrawlGeeker(w *sync.WaitGroup) {
 
 	// Consume
 	q.Run(frontPageCollector)
-	log.Println("Finished " + currentSource.Name)
+	log.Printf("\x1b[%dm%s %s\x1b[0m", 31, currentSource.Name, "Finished!")
 	log.Println("Total Products Collected: ", totalProductsCollected)
 	w.Done()
 }

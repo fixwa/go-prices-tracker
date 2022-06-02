@@ -41,7 +41,15 @@ func init() {
 		BaseURL:        "https://www.geeker.com.ar/",
 		AllowedDomains: "www.geeker.com.ar",
 	}
+
+	s3 := ProductSource{
+		ID:             3,
+		Name:           "Distriland",
+		BaseURL:        "https://www.distriland.com.ar/",
+		AllowedDomains: "www.distriland.com.ar",
+	}
 	ProductsSources = make(map[int]*ProductSource)
 	ProductsSources[1] = &s1
 	ProductsSources[2] = &s2
+	ProductsSources[3] = &s3
 }

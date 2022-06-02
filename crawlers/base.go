@@ -10,19 +10,6 @@ import (
 	"time"
 )
 
-var (
-	productsLinks        map[string]bool
-	categoriesLinks      map[string]bool
-	categoriesPagesLinks map[string]bool
-	currentSource        *models.ProductSource
-)
-
-func init() {
-	productsLinks = map[string]bool{}
-	categoriesLinks = map[string]bool{}
-	categoriesPagesLinks = map[string]bool{}
-}
-
 func storeProduct(product *models.Product) {
 	productsCollection := database.Db.Collection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
