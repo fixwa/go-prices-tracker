@@ -7,11 +7,12 @@ import (
 )
 
 func main() {
+	return
 	database.ConnectDatabase()
 
 	var waiter sync.WaitGroup
-	//waiter.Add(1)
-	//go crawlers.CrawlImportadoraRonson(&waiter)
+	waiter.Add(1)
+	go crawlers.CrawlImportadoraRonson(&waiter)
 
 	waiter.Add(1)
 	go crawlers.CrawlGeeker(&waiter)
