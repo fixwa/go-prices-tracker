@@ -21,9 +21,11 @@ var (
 
 // always runs
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Print(err)
+	if len(os.Getenv("MONGODB_HOST")) < 1 {
+		err := godotenv.Load()
+		if err != nil {
+			log.Print(err)
+		}
 	}
 
 	MONGODB_USER = os.Getenv("MONGODB_USER")
@@ -31,6 +33,7 @@ func init() {
 	MONGODB_DBNAME = os.Getenv("MONGODB_DBNAME")
 	MONGODB_HOST = os.Getenv("MONGODB_HOST")
 
+	fmt.Printf("\nU:%s, P:%s, H:%s, D:%s\n\n", MONGODB_USER, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DBNAME)
 	//migrateDatabase()
 }
 
