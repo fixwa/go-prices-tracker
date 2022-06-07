@@ -48,10 +48,15 @@ func ConnectDatabase() {
 	//}
 
 	// mongodb+srv
-	uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
+	// This works locally::
+	//uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
 	//uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST
 	//fmt.Println(uri)
 	//uri := "mongodb://root:root@localhost:27017"
+
+	// this works on HEROKU
+	uri := "mongodb+srv://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
+
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 
 	if err != nil {
