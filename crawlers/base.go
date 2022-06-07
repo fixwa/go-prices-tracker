@@ -15,19 +15,6 @@ func storeProduct(product *models.Product) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	//p := models.Product{
-	//	//ID:           primitive.ObjectID{},
-	//	Title:        "The Title",
-	//	Description:      "The content",
-	//	Source:       0,
-	//	URL:          "http://example.com",
-	//	Price:        "100.00",
-	//	CategoryName: "Testing",
-	//	Thumbnail:    "http://example.com/image.png",
-	//	PublishedAt:  time.Time{},
-	//	CreatedAt:    time.Time{},
-	//}
-
 	result, err := productsCollection.InsertOne(ctx, bson.M{
 		"title":        product.Title,
 		"description":  product.Description,
@@ -43,4 +30,8 @@ func storeProduct(product *models.Product) {
 		panic(err)
 	}
 	fmt.Println("Stored product: ", result.InsertedID.(primitive.ObjectID))
+}
+
+func init() {
+	database.ConnectDatabase()
 }

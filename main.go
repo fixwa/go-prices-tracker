@@ -1,24 +1,32 @@
 package main
 
 import (
+	"flag"
 	"github.com/fixwa/go-prices-tracker/crawlers"
-	"github.com/fixwa/go-prices-tracker/database"
 	"sync"
 )
 
 func main() {
-	database.ConnectDatabase()
+	crawlerName := flag.String("crawler", "default", "Crawler to execute")
+	flag.Parse()
+	if *crawlerName == "default" {
+		panic("Crawler not specified.")
+	}
 
 	var waiter sync.WaitGroup
 
-	waiter.Add(1)
-	go crawlers.CrawlDistriland(&waiter)
+	switch *crawlerName {
+	case "distriland":
+		waiter.Add(1)
+		go crawlers.CrawlDistriland(&waiter)
 
-	waiter.Add(1)
-	go crawlers.CrawlImportadoraRonson(&waiter)
-
-	waiter.Add(1)
-	go crawlers.CrawlGeeker(&waiter)
+	case "importadora-ronson":
+		waiter.Add(1)
+		go crawlers.CrawlImportadoraRonson(&waiter)
+	case "geeker":
+		waiter.Add(1)
+		go crawlers.CrawlGeeker(&waiter)
+	}
 
 	waiter.Wait()
 }
