@@ -33,7 +33,8 @@ func init() {
 	MONGODB_DBNAME = os.Getenv("MONGODB_DBNAME")
 	MONGODB_HOST = os.Getenv("MONGODB_HOST")
 
-	fmt.Printf("\nU:%s, P:%s, H:%s, D:%s\n\n", MONGODB_USER, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DBNAME)
+	// debug line
+	//fmt.Printf("\nU:%s, P:%s, H:%s, D:%s\n\n", MONGODB_USER, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DBNAME)
 	//migrateDatabase()
 }
 
