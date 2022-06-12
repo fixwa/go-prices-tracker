@@ -39,27 +39,18 @@ func init() {
 }
 
 func ConnectDatabase() {
-	//if envMongoDbUser := os.Getenv("MONGODB_USER"); envMongoDbUser != "" {
-	//	MONGODB_USER = envMongoDbUser
-	//}
-	//
-	//if envMongoDbPassword := os.Getenv("MONGODB_PASSWORD"); envMongoDbPassword != "" {
-	//	MONGODB_PASSWORD = envMongoDbPassword
-	//}
-	//
-	//if envMongoDbHost := os.Getenv("MONGODB_HOST"); envMongoDbHost != "" {
-	//	MONGODB_HOST = envMongoDbHost
-	//}
 
 	// mongodb+srv
 	// This works locally::
 	//uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
 	//uri := "mongodb://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST
 	//fmt.Println(uri)
-	//uri := "mongodb://root:root@localhost:27017"
 
-	// this works on HEROKU
-	uri := "mongodb+srv://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
+	//  HEROKU
+	//uri := "mongodb+srv://" + MONGODB_USER + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + "/" + MONGODB_DBNAME + "?retryWrites=true&w=majority"
+
+	// Local
+	uri := "mongodb://root:root@localhost:27017"
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 

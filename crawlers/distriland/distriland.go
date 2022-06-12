@@ -1,8 +1,9 @@
-package crawlers
+package distriland
 
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/fixwa/go-prices-tracker/crawlers"
 	"github.com/fixwa/go-prices-tracker/models"
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/queue"
@@ -12,14 +13,24 @@ import (
 	"time"
 )
 
+var (
+	totalProductsCollected int
+	currentSource          *models.ProductSource
+)
+
 func CrawlDistriland(w *sync.WaitGroup) {
+	currentSource = models.ProductsSources[3]
+	existingProducts := crawlers.GetProductsBySource(currentSource)
 	productsLinks := map[string]bool{}
+	for _, product := range existingProducts {
+		productsLinks[product.URL] = true
+	}
+
 	categoriesLinks := map[string]bool{}
 	//categoriesPagesLinks := map[string]bool{}
-	var totalProductsCollected int = 0
+	totalProductsCollected = 0
 
-	currentSource := models.ProductsSources[3]
-	fmt.Printf("%v\n", currentSource)
+	//fmt.Printf("%v\n", currentSource)
 	log.Println("Crawling " + currentSource.Name)
 
 	c := colly.NewCollector(
@@ -42,7 +53,7 @@ func CrawlDistriland(w *sync.WaitGroup) {
 			}
 
 			if _, found := categoriesLinks[categoryLink]; !found {
-				fmt.Println("Category found: " + categoryLink)
+				//fmt.Println("Category found: " + categoryLink)
 				productCollector.Visit(categoryLink)
 				categoriesLinks[categoryLink] = true
 			} else {
@@ -57,18 +68,17 @@ func CrawlDistriland(w *sync.WaitGroup) {
 			if strings.Index(productLink, "/productos/") == -1 {
 				return
 			}
-			fmt.Println("Product found: " + productLink)
 			if _, found := productsLinks[productLink]; !found {
 				detailCollector.Visit(productLink)
 				productsLinks[productLink] = true
+				fmt.Println("New Product found: " + productLink)
 			} else {
 				productsLinks[productLink] = false
 			}
 		})
 	})
 
-	detailCollector.OnHTML("body.template-product", InspectAndStore)
-	totalProductsCollected++ //@fixme
+	detailCollector.OnHTML("body.template-product", inspectAndStore)
 	q.AddURL(currentSource.BaseURL)
 
 	// Consume
@@ -79,7 +89,11 @@ func CrawlDistriland(w *sync.WaitGroup) {
 	w.Done()
 }
 
-func InspectAndStore(e *colly.HTMLElement) {
+func Clear() {
+	crawlers.DeleteAllBySource(currentSource)
+}
+
+func inspectAndStore(e *colly.HTMLElement) {
 	title := e.ChildText("h1#product-name")
 	price := e.ChildText(".price-container h4")
 	thumbnail := e.ChildAttr("img.product-slider-image", "data-srcset")
@@ -97,13 +111,14 @@ func InspectAndStore(e *colly.HTMLElement) {
 	product := &models.Product{
 		Title:        title,
 		Description:  description,
-		Source:       3, //currentSource.ID,
+		Source:       currentSource.ID,
 		URL:          e.Request.URL.String(),
 		Price:        price,
 		CategoryName: categoryName,
 		Thumbnail:    thumbnail,
 		PublishedAt:  publishedAt,
 	}
-	fmt.Printf("%v\n", product)
-	//	storeProduct(product)
+	//fmt.Printf("%v\n", product)
+	crawlers.StoreProduct(product)
+	totalProductsCollected++
 }

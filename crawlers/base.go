@@ -7,10 +7,15 @@ import (
 	"github.com/fixwa/go-prices-tracker/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"time"
 )
 
-func storeProduct(product *models.Product) {
+func init() {
+	database.ConnectDatabase()
+}
+
+func StoreProduct(product *models.Product) {
 	productsCollection := database.Db.Collection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
@@ -29,9 +34,48 @@ func storeProduct(product *models.Product) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Stored product: ", result.InsertedID.(primitive.ObjectID))
+
+	log.Printf("\x1b[%dm Stored product: %s\x1b[0m", 32, result.InsertedID.(primitive.ObjectID))
 }
 
-func init() {
-	database.ConnectDatabase()
+func GetProductsBySource(source *models.ProductSource) []models.Product {
+	productsCollection := database.Db.Collection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	cursor, err := productsCollection.Find(ctx, bson.M{"source": source.ID})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var result []models.Product
+	if err = cursor.All(ctx, &result); err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+func DeleteAllBySource(source *models.ProductSource) {
+	productsCollection := database.Db.Collection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	deleteCollection, err := productsCollection.DeleteMany(ctx, bson.M{"source": source.ID})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Deleted %v products.\n", deleteCollection.DeletedCount)
+}
+
+func DeleteAll() {
+	productsCollection := database.Db.Collection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	deleteCollection, err := productsCollection.DeleteMany(ctx, bson.D{{}})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Deleted %v products.\n", deleteCollection.DeletedCount)
 }

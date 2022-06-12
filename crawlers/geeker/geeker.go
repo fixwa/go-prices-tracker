@@ -1,7 +1,8 @@
-package crawlers
+package geeker
 
 import (
 	"fmt"
+	"github.com/fixwa/go-prices-tracker/crawlers"
 	"github.com/fixwa/go-prices-tracker/models"
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/queue"
@@ -10,14 +11,23 @@ import (
 	"time"
 )
 
+var (
+	totalProductsCollected int
+	currentSource          *models.ProductSource
+)
+
 func CrawlGeeker(w *sync.WaitGroup) {
+	currentSource = models.ProductsSources[2]
+	existingProducts := crawlers.GetProductsBySource(currentSource)
 	productsLinks := map[string]bool{}
+	for _, product := range existingProducts {
+		productsLinks[product.URL] = true
+	}
+
 	categoriesLinks := map[string]bool{}
 	categoriesPagesLinks := map[string]bool{}
-	var totalProductsCollected int = 0
 
-	currentSource := models.ProductsSources[2]
-	fmt.Printf("%v\n", currentSource)
+	//fmt.Printf("%v\n", currentSource)
 	log.Println("Crawling " + currentSource.Name)
 
 	frontPageCollector := colly.NewCollector(
@@ -56,7 +66,7 @@ func CrawlGeeker(w *sync.WaitGroup) {
 			categoryLink = currentSource.BaseURL + categoryLink
 
 			if _, found := categoriesLinks[categoryLink]; !found {
-				fmt.Println("Category found: " + categoryLink)
+				//fmt.Println("Category found: " + categoryLink)
 				categoryCollector.Visit(categoryLink)
 				categoriesLinks[categoryLink] = true
 			} else {
@@ -78,7 +88,7 @@ func CrawlGeeker(w *sync.WaitGroup) {
 			categoryLink = currentSource.BaseURL + categoryLink
 
 			if _, found := categoriesPagesLinks[categoryLink]; !found {
-				fmt.Println("Category Page# Found: " + categoryLink)
+				//fmt.Println("Category Page# Found: " + categoryLink)
 				productCollector.Visit(categoryLink)
 				categoriesPagesLinks[categoryLink] = true
 			} else {
@@ -99,37 +109,17 @@ func CrawlGeeker(w *sync.WaitGroup) {
 			}
 			productLink = currentSource.BaseURL + productLink
 
-			fmt.Println("Product found: " + productLink)
 			if _, found := productsLinks[productLink]; !found {
 				detailCollector.Visit(productLink)
 				productsLinks[productLink] = true
+				fmt.Println("New Product found: " + productLink)
 			} else {
 				productsLinks[productLink] = false
 			}
 		})
 	})
 
-	detailCollector.OnHTML("body.detalle", func(e *colly.HTMLElement) {
-		title := e.ChildText("#detalle > div.detalle-rpincipal h1.product-title")
-		description := e.ChildText("#detalle > div.detalle-rpincipal div.details-description")
-		price := e.ChildText("#precio")
-		thumbnail := e.ChildAttr("#img_prod img", "src")
-		publishedAt := time.Now()
-		categoryName := e.ChildText("div.container.general ul.breadcrumb > a")
-
-		product := &models.Product{
-			Title:        title,
-			Description:  description,
-			Source:       currentSource.ID,
-			URL:          e.Request.URL.String(),
-			Price:        price,
-			CategoryName: categoryName,
-			Thumbnail:    thumbnail,
-			PublishedAt:  publishedAt,
-		}
-		storeProduct(product)
-		totalProductsCollected++
-	})
+	detailCollector.OnHTML("body.detalle", inspectAndStore)
 
 	q.AddURL(currentSource.BaseURL)
 
@@ -138,4 +128,30 @@ func CrawlGeeker(w *sync.WaitGroup) {
 	log.Printf("\x1b[%dm%s %s\x1b[0m", 31, currentSource.Name, "Finished!")
 	log.Println("Total Products Collected: ", totalProductsCollected)
 	w.Done()
+}
+
+func Clear() {
+	crawlers.DeleteAllBySource(currentSource)
+}
+
+func inspectAndStore(e *colly.HTMLElement) {
+	title := e.ChildText("#detalle > div.detalle-rpincipal h1.product-title")
+	description := e.ChildText("#detalle > div.detalle-rpincipal div.details-description")
+	price := e.ChildText("#precio")
+	thumbnail := e.ChildAttr("#img_prod a", "href")
+	publishedAt := time.Now()
+	categoryName := e.ChildText("div.container.general ul.breadcrumb > a")
+
+	product := &models.Product{
+		Title:        title,
+		Description:  description,
+		Source:       currentSource.ID,
+		URL:          e.Request.URL.String(),
+		Price:        price,
+		CategoryName: categoryName,
+		Thumbnail:    currentSource.BaseURL + thumbnail,
+		PublishedAt:  publishedAt,
+	}
+	crawlers.StoreProduct(product)
+	totalProductsCollected++
 }
