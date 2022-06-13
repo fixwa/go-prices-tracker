@@ -54,6 +54,12 @@ func main() {
 			geeker.Clear()
 		}
 		go geeker.CrawlGeeker(&waiter)
+
+	case "all":
+		waiter.Add(3)
+		go importadoraronson.CrawlImportadoraRonson(&waiter)
+		go distriland.CrawlDistriland(&waiter)
+		go geeker.CrawlGeeker(&waiter)
 	}
 
 	waiter.Wait()
