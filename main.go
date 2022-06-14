@@ -39,27 +39,27 @@ func main() {
 		if *clear == "yes" {
 			distriland.Clear()
 		}
-		go distriland.CrawlDistriland(&waiter)
+		go distriland.Crawl(&waiter)
 
 	case "importadora-ronson":
 		waiter.Add(1)
 		if *clear == "yes" {
 			importadoraronson.Clear()
 		}
-		go importadoraronson.CrawlImportadoraRonson(&waiter)
+		go importadoraronson.Crawl(&waiter)
 
 	case "geeker":
 		waiter.Add(1)
 		if *clear == "yes" {
 			geeker.Clear()
 		}
-		go geeker.CrawlGeeker(&waiter)
+		go geeker.Crawl(&waiter)
 
 	case "all":
 		waiter.Add(3)
-		go importadoraronson.CrawlImportadoraRonson(&waiter)
-		go distriland.CrawlDistriland(&waiter)
-		go geeker.CrawlGeeker(&waiter)
+		go importadoraronson.Crawl(&waiter)
+		go distriland.Crawl(&waiter)
+		go geeker.Crawl(&waiter)
 	}
 
 	waiter.Wait()

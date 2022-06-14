@@ -16,7 +16,7 @@ var (
 	currentSource          *models.ProductSource
 )
 
-func CrawlGeeker(w *sync.WaitGroup) {
+func Crawl(w *sync.WaitGroup) {
 	currentSource = models.ProductsSources[2]
 	existingProducts := crawlers.GetProductsBySource(currentSource)
 	productsLinks := map[string]bool{}

@@ -17,7 +17,7 @@ var (
 	currentSource          *models.ProductSource
 )
 
-func CrawlImportadoraRonson(w *sync.WaitGroup) {
+func Crawl(w *sync.WaitGroup) {
 	currentSource = models.ProductsSources[1]
 	existingProducts := crawlers.GetProductsBySource(currentSource)
 	productsLinks := map[string]bool{}

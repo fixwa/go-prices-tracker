@@ -18,7 +18,7 @@ var (
 	currentSource          *models.ProductSource
 )
 
-func CrawlDistriland(w *sync.WaitGroup) {
+func Crawl(w *sync.WaitGroup) {
 	currentSource = models.ProductsSources[3]
 	existingProducts := crawlers.GetProductsBySource(currentSource)
 	productsLinks := map[string]bool{}
