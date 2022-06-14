@@ -30,19 +30,7 @@ func Crawl(w *sync.WaitGroup) {
 	//fmt.Printf("%v\n", currentSource)
 	log.Println("Crawling " + currentSource.Name)
 
-	frontPageCollector := colly.NewCollector(
-		colly.AllowedDomains(currentSource.AllowedDomains),
-	)
-
-	detailCollector := colly.NewCollector(
-		colly.AllowedDomains(currentSource.AllowedDomains),
-	)
-
-	productCollector := colly.NewCollector(
-		colly.AllowedDomains(currentSource.AllowedDomains),
-	)
-
-	categoryCollector := colly.NewCollector(
+	c := colly.NewCollector(
 		colly.AllowedDomains(currentSource.AllowedDomains),
 	)
 
@@ -51,11 +39,11 @@ func Crawl(w *sync.WaitGroup) {
 		&queue.InMemoryQueueStorage{MaxSize: 10000},
 	)
 
-	//detailCollector := c.Clone()
-	//productCollector := c.Clone()
-	//categoryCollector := c.Clone()
+	detailCollector := c.Clone()
+	productCollector := c.Clone()
+	categoryCollector := c.Clone()
 
-	frontPageCollector.OnHTML(".nav", func(e *colly.HTMLElement) {
+	c.OnHTML(".nav", func(e *colly.HTMLElement) {
 		//fmt.Printf("%v\n", e.ChildText("li"))
 		e.ForEach("a", func(_ int, el *colly.HTMLElement) {
 			categoryLink := el.Attr("href")
@@ -124,7 +112,7 @@ func Crawl(w *sync.WaitGroup) {
 	q.AddURL(currentSource.BaseURL)
 
 	// Consume
-	q.Run(frontPageCollector)
+	q.Run(c)
 	log.Printf("\x1b[%dm%s %s\x1b[0m", 31, currentSource.Name, "Finished!")
 	log.Println("Total Products Collected: ", totalProductsCollected)
 	w.Done()

@@ -7,6 +7,7 @@ import (
 	"github.com/fixwa/go-prices-tracker/crawlers/distriland"
 	"github.com/fixwa/go-prices-tracker/crawlers/geeker"
 	"github.com/fixwa/go-prices-tracker/crawlers/importadoraronson"
+	"github.com/fixwa/go-prices-tracker/crawlers/lawebdelcelular"
 	"sync"
 )
 
@@ -24,6 +25,8 @@ func main() {
 		importadoraronson.Clear()
 	case "geeker":
 		geeker.Clear()
+	case "la-web-del-celular":
+		lawebdelcelular.Clear()
 	}
 
 	if *crawlerName == "default" {
@@ -55,11 +58,19 @@ func main() {
 		}
 		go geeker.Crawl(&waiter)
 
+	case "la-web-del-celular":
+		waiter.Add(1)
+		if *clear == "yes" {
+			lawebdelcelular.Clear()
+		}
+		go lawebdelcelular.Crawl(&waiter)
+
 	case "all":
-		waiter.Add(3)
+		waiter.Add(4)
 		go importadoraronson.Crawl(&waiter)
 		go distriland.Crawl(&waiter)
 		go geeker.Crawl(&waiter)
+		go lawebdelcelular.Crawl(&waiter)
 	}
 
 	waiter.Wait()

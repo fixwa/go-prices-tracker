@@ -6,7 +6,7 @@ import (
 	"github.com/fixwa/go-prices-tracker/database"
 	"github.com/fixwa/go-prices-tracker/models"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"time"
 )
@@ -15,7 +15,7 @@ func init() {
 	database.ConnectDatabase()
 }
 
-func StoreProduct(product *models.Product) {
+func StoreProduct(product *models.Product) (*mongo.InsertOneResult, error) {
 	productsCollection := database.Db.Collection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
@@ -31,11 +31,9 @@ func StoreProduct(product *models.Product) {
 		"createdAt":    time.Now(),
 		"publishedAt":  product.PublishedAt,
 	})
-	if err != nil {
-		panic(err)
-	}
 
-	log.Printf("\x1b[%dm Stored product: %s\x1b[0m", 32, result.InsertedID.(primitive.ObjectID))
+	//log.Printf("\x1b[%dm Stored product: %s\x1b[0m", 32, result.InsertedID.(primitive.ObjectID))
+	return result, err
 }
 
 func GetProductsBySource(source *models.ProductSource) []models.Product {

@@ -28,28 +28,29 @@ type ProductSource struct {
 var ProductsSources map[int]*ProductSource
 
 func init() {
-	s1 := ProductSource{
+	ProductsSources = make(map[int]*ProductSource)
+	ProductsSources[1] = &ProductSource{
 		ID:             1,
 		Name:           "Importadora Ronson",
 		BaseURL:        "https://importadoraronson.com/",
 		AllowedDomains: "importadoraronson.com",
 	}
-
-	s2 := ProductSource{
+	ProductsSources[2] = &ProductSource{
 		ID:             2,
 		Name:           "Geeker",
 		BaseURL:        "https://www.geeker.com.ar/",
 		AllowedDomains: "www.geeker.com.ar",
 	}
-
-	s3 := ProductSource{
+	ProductsSources[3] = &ProductSource{
 		ID:             3,
 		Name:           "Distriland",
 		BaseURL:        "https://www.distriland.com.ar/",
 		AllowedDomains: "www.distriland.com.ar",
 	}
-	ProductsSources = make(map[int]*ProductSource)
-	ProductsSources[1] = &s1
-	ProductsSources[2] = &s2
-	ProductsSources[3] = &s3
+	ProductsSources[4] = &ProductSource{
+		ID:             4,
+		Name:           "La Web Del Celular",
+		BaseURL:        "https://www.lawebdelcelular.com.ar/",
+		AllowedDomains: "www.lawebdelcelular.com.ar",
+	}
 }
